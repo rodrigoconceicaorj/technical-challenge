@@ -24,12 +24,14 @@ Infraestrutura completa com duas aplicações (Java e Python), cache distribuíd
 docker-compose up --build
 
 ## Acessos
+```bash
 Java app: http://localhost:8080
 Python app: http://localhost:8000
 Grafana: http://localhost:3000 (admin/admin)
 Prometheus: http://localhost:9090
 
 Logs (via Grafana + Loki)
+```
 
 ## 🧪 Testes Rápidos
 ```bash
@@ -48,26 +50,29 @@ ou via curl
 
 🧱 Arquitetura (em construção) 
 https://excalidraw.com/#json=BWLBZ-_hraJz4_QdYPRnS,mtO4yczrMHtAEvWjo2CnSA
-
+```bash
 Cliente → Nginx → Java/Python → Redis
                  ↓
             Prometheus → Grafana
                  ↓
                Loki
+```
 
 🔄 Atualizações
+```bash
 Rolling Updates com health checks e rollback automático
 Blue-Green Deployment descrito no diagrama
 Pipeline sugerido: Build → Test → Scan → Deploy → Monitor
+```
 
 💡 Melhorias Futuras
+```bash
 HTTPS + Rate limiting
-
 Secrets seguros (vault)
-
 Auto-scaling (HPA ou keda))
 Tracing distribuído (Jaeger/grafana tempo)
 APM e métricas de negócio
+```
 
 📁 Arquivos
 docker-compose.yml
