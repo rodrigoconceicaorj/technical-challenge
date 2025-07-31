@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'java-app'
+    static_configs:
+      - targets: ['java-app:8080']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'python-app'
+    static_configs:
+      - targets: ['python-app:8000']
+    metrics_path: '/metrics'
