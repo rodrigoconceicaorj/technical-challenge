@@ -32,20 +32,18 @@ Prometheus: http://localhost:9090
 Logs (via Grafana + Loki)
 
 ## 🧪 Testes Rápidos
-Via Nginx
-curl http://localhost/health_check
-curl http://localhost/api/v1/time
+```bash
+# Java App
+http://localhost:8080/health_check
+http://localhost:8080/time
+http://localhost:8080/actuator/prometheus
 
-==============================================
-## ACESSO DIRETO 
-# Java
-curl http://localhost:8080/health_check
-curl http://localhost:8080/time
-==============================================
-# Python
-curl http://localhost:8000/api/v1/health_check
-curl http://localhost:8000/api/v1/time
-==============================================
+# Python App
+http://localhost:8000/api/v1/health_check
+http://localhost:8000/api/v1/time
+http://localhost:8000/metrics
+```
+ou via curl
 
 
 🧱 Arquitetura (em construção) 
