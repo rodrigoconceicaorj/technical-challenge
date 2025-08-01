@@ -1,0 +1,98 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Coletar logs dos containers Docker
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'logstream'
+      - source_labels: ['__meta_docker_container_label_logging_jobname']
+        target_label: 'job'
+      - source_labels: ['__meta_docker_container_label_logging_driver']
+        target_label: 'driver'
+      - source_labels: ['__meta_docker_container_label_logging_jobname']
+        regex: '.*'
+        action: replace
+        target_label: 'job'
+        replacement: 'docker'
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container_name'
+      - source_labels: ['__meta_docker_container_image']
+        target_label: 'image'
+      - source_labels: ['__meta_docker_container_label_logging_jobname']
+        regex: '.*'
+        action: replace
+        target_label: '__path__'
+        replacement: '/var/lib/docker/containers/*/*-json.log'
+
+  # Coletar logs específicos das aplicações
+  - job_name: java-app
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: java-app
+          __path__: /var/lib/docker/containers/*/java-app*/*-json.log
+
+  - job_name: python-app
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: python-app
+          __path__: /var/lib/docker/containers/*/python-app*/*-json.log
+
+  - job_name: nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          __path__: /var/lib/docker/containers/*/nginx*/*-json.log
+
+  - job_name: redis
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: redis
+          __path__: /var/lib/docker/containers/*/redis*/*-json.log
+
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: prometheus
+          __path__: /var/lib/docker/containers/*/prometheus*/*-json.log
+
+  - job_name: grafana
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: grafana
+          __path__: /var/lib/docker/containers/*/grafana*/*-json.log
+
+  - job_name: loki
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: loki
+          __path__: /var/lib/docker/containers/*/loki*/*-json.log 
