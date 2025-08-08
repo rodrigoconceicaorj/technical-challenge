@@ -10,6 +10,13 @@ Infraestrutura completa com duas aplicações (Java e Python), cache distribuíd
 - 4GB RAM
 - 10GB de espaço em disco
 
+
+REDIS
+powershell -ExecutionPolicy Bypass -File .\demo-cache.ps1 
+PROMETHEUS
+powershell -ExecutionPolicy Bypass -File .\demo-alerta-simples.ps1
+
+
 ### Para executar:
 ```bash
 docker-compose up --build

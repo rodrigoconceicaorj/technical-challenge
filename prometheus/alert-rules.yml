@@ -1,0 +1,86 @@
+groups:
+  - name: microservices_alerts
+    rules:
+      # Alerta CRÍTICO - Serviço completamente indisponível
+      - alert: ServiceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: critical
+          alert_type: incident
+        annotations:
+          summary: "INCIDENTE CRÍTICO: O recurso {{ $labels.job }} do tipo {{ if eq $labels.job \"java-app\" }}aplicação{{ else if eq $labels.job \"python-app\" }}aplicação{{ else if eq $labels.job \"node-exporter\" }}container{{ else }}serviço{{ end }} está indisponível"
+          description: "O serviço {{ $labels.job }} na instância {{ $labels.instance }} está fora do ar há mais de 30 segundos. Status code: DOWN. Para esse tipo de problema é recomendado que leia as documentações disponibilizadas no confluence."
+          runbook_url: "https://confluence.company.com/runbooks/service-down"
+
+      # Alerta ALTO - Alta taxa de erro HTTP
+      - alert: HighErrorRate
+        expr: (rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])) * 100 > 10
+        for: 2m
+        labels:
+          severity: high
+          alert_type: alerta
+        annotations:
+          summary: "ALERTA: Alta taxa de erro no recurso {{ $labels.job }} do tipo aplicação"
+          description: "A aplicação {{ $labels.job }} na instância {{ $labels.instance }} está apresentando mais de 10% de erros HTTP 5xx. Status code: {{ $labels.status }}. Para esse tipo de problema é recomendado que leia as documentações disponibilizadas no confluence."
+          runbook_url: "https://confluence.company.com/runbooks/high-error-rate"
+
+      # Aviso MÉDIO - Tempo de resposta elevado
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: medium
+          alert_type: aviso
+        annotations:
+          summary: "AVISO: Tempo de resposta elevado no recurso {{ $labels.job }} do tipo aplicação"
+          description: "A aplicação {{ $labels.job }} na instância {{ $labels.instance }} está com tempo de resposta P95 acima de 2 segundos. Status code: SLOW. Para esse tipo de problema é recomendado que leia as documentações disponibilizadas no confluence."
+          runbook_url: "https://confluence.company.com/runbooks/slow-response"
+
+      # Alerta CRÍTICO - Alto uso de CPU
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 3m
+        labels:
+          severity: critical
+          alert_type: incident
+        annotations:
+          summary: "INCIDENTE: O recurso {{ $labels.instance }} do tipo container está com alto uso de CPU"
+          description: "O container na instância {{ $labels.instance }} está com uso de CPU acima de 90% há mais de 3 minutos. Status code: HIGH_CPU. Para esse tipo de problema é recomendado que leia as documentações disponibilizadas no confluence."
+          runbook_url: "https://confluence.company.com/runbooks/high-cpu"
+
+      # Alerta ALTO - Alto uso de memória
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: high
+          alert_type: alerta
+        annotations:
+          summary: "ALERTA: O recurso {{ $labels.instance }} do tipo container está com alto uso de memória"
+          description: "O container na instância {{ $labels.instance }} está com uso de memória acima de 85% há mais de 5 minutos. Status code: HIGH_MEMORY. Para esse tipo de problema é recomendado que leia as documentações disponibilizadas no confluence."
+          runbook_url: "https://confluence.company.com/runbooks/high-memory"
+
+      # Aviso MÉDIO - Alto uso de disco
+      - alert: HighDiskUsage
+        expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/"} * 100) / node_filesystem_size_bytes{mountpoint="/"}) > 80
+        for: 10m
+        labels:
+          severity: medium
+          alert_type: aviso
+        annotations:
+          summary: "AVISO: O recurso {{ $labels.instance }} do tipo container está com alto uso de disco"
+          description: "O container na instância {{ $labels.instance }} está com uso de disco acima de 80% há mais de 10 minutos. Status code: HIGH_DISK. Para esse tipo de problema é recomendado que leia as documentações disponibilizadas no confluence."
+          runbook_url: "https://confluence.company.com/runbooks/high-disk"
+
+      # Alerta CRÍTICO - Redis indisponível
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          alert_type: incident
+        annotations:
+          summary: "INCIDENTE CRÍTICO: O recurso Redis do tipo container está indisponível"
+          description: "O container Redis está fora do ar há mais de 1 minuto. Status code: DOWN. Para esse tipo de problema é recomendado que leia as documentações disponibilizadas no confluence."
+          runbook_url: "https://confluence.company.com/runbooks/redis-down"
